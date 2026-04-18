@@ -7,7 +7,7 @@
 echo "Blocking all torrent traffic using nftables. Please wait..."
 
 # Download tracker domains list
-wget -q -O /etc/trackers https://raw.githubusercontent.com/nikzad-avasam/block-torrent-on-server/main/domains
+wget -q -O /etc/trackers https://raw.githubusercontent.com/SpaceCore-Dev/block-torrent-on-server/refs/heads/main/domains
 
 # Create nftables table and set if not already present
 nft list tables | grep -q '^table inet torrentblock$' || nft add table inet torrentblock
@@ -27,7 +27,7 @@ done < <(sort -u /etc/trackers)
 # Setup daily cron job to refresh tracker IPs
 cat >/etc/cron.daily/nft-torrent-block<<'EOF'
 #!/bin/bash
-wget -q -O /etc/trackers https://raw.githubusercontent.com/nikzad-avasam/block-torrent-on-server/main/domains
+wget -q -O /etc/trackers https://raw.githubusercontent.com/SpaceCore-Dev/block-torrent-on-server/refs/heads/main/domains
 nft flush chain inet torrentblock trackerblock
 while read -r domain; do
     ip=$(getent ahosts "$domain" | awk '{print $1}' | head -n 1)
@@ -40,7 +40,7 @@ EOF
 chmod +x /etc/cron.daily/nft-torrent-block
 
 # Optional: Update /etc/hosts to block domains at resolution level
-curl -s -LO https://raw.githubusercontent.com/nikzad-avasam/block-torrent-on-server/main/Thosts
+curl -s -LO https://raw.githubusercontent.com/SpaceCore-Dev/block-torrent-on-server/refs/heads/main/Thosts
 cat Thosts >> /etc/hosts
 sort -uf /etc/hosts > /etc/hosts.uniq && mv /etc/hosts{.uniq,}
 
